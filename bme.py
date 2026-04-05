@@ -8,7 +8,8 @@ i2c = busio.I2C(board.SCL, board.SDA)
 # Create BME280 object
 bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
 
-# Print values
-print(f"Temperature: {bme280.temperature:.2f} C")
-print(f"Humidity: {bme280.humidity:.2f} %")
-print(f"Pressure: {bme280.pressure:.2f} hPa")
+def read_bme280():
+    return{
+        "temperature": round(bme280.temperature, 2),
+        "humidity": round(bme280.humidity, 2),
+    }

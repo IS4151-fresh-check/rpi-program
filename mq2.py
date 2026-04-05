@@ -18,7 +18,10 @@ LPG_CURVE = [2.3, 0.45, -0.47]
 spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
 cs = digitalio.DigitalInOut(board.D5)
 mcp = MCP.MCP3008(spi, cs)
-channel = AnalogIn(mcp, MCP.P0)
+channel0 = AnalogIn(mcp, MCP.P0)
+channel1 = AnalogIn(mcp, MCP.P1)
+channel2 = AnalogIn(mcp, MCP.P2)
+
 
 def get_rs(voltage):
     """Calculate sensor resistance Rs from voltage."""
