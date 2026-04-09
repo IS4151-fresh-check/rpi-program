@@ -1,0 +1,39 @@
+{
+  "feature_columns": [
+    "hours_elapsed",
+    "ppm_current",
+    "ppm_std",
+    "ppm_min",
+    "ppm_max",
+    "ppm_range",
+    "ppm_cv",
+    "ppm_slope",
+    "ppm_r_squared",
+    "ppm_q25",
+    "ppm_q75",
+    "ppm_iqr",
+    "recent_slope",
+    "ppm_acceleration",
+    "v_mean",
+    "v_std",
+    "v_current",
+    "v_slope"
+  ],
+  "window_size": 36,
+  "recent_window": 6,
+  "stage_thresholds": {
+    "fresh": 500,
+    "ripe": 2000,
+    "overripe": 5000
+  },
+  "stage_to_action": {
+    "fresh": "maintain_display",
+    "ripe": "promote_for_sale",
+    "overripe": "apply_discount",
+    "spoiled": "remove_from_shelf"
+  },
+  "sensor": "S0",
+  "model_depth": 4,
+  "training_samples": 972,
+  "version": "v7.0"
+}

@@ -41,13 +41,24 @@ for _ in range(50):
 ro = (total_rs / 50) / RO_CLEAN_AIR_FACTOR
 print(f"Calibration done! R0 = {ro:.2f} kOhm")
 
-# 3. Main Loop
-try:
-    while True:
-        rs = get_rs(channel.voltage)
-        ppm = get_ppm(rs, ro, LPG_CURVE)
+# 3. Public function (called by app.py)
+def read_mq2():
+    """Read MQ2 sensor and return voltage + PPM."""
+    voltage = channel.voltage
+    rs = get_rs(voltage)
+    ppm = get_ppm(rs, ro, LPG_CURVE)
+    return {
+        "voltage": round(voltage, 2),
+        "ppm": round(ppm, 2),
+    }
+
+# 4. Main Loop
+# try:
+#     while True:
+#         rs = get_rs(channel.voltage)
+#         ppm = get_ppm(rs, ro, LPG_CURVE)
         
-        print(f"Voltage: {channel.voltage:.2f}V | LPG: {ppm:.2f} PPM")
-        time.sleep(1)
-except KeyboardInterrupt:
-    print("Stopped.")
+#         print(f"Voltage: {channel.voltage:.2f}V | LPG: {ppm:.2f} PPM")
+#         time.sleep(1)
+# except KeyboardInterrupt:
+#     print("Stopped.")
