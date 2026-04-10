@@ -52,6 +52,13 @@ def read_camera():
         conf = probs.top1conf.item()
         label = r.names[class_id]
 
+        if label == "freshripe":
+            label = "ripe"
+        elif label == "freshunripe":
+            label = "unripe"
+        elif label == "rotten":
+            label = "spoiled"
+
         # 4. Save image for the UI (Resize for smaller Base64 payload)
         small_frame = cv2.resize(frame_bgr, (320, 240))
         _, buffer = cv2.imencode('.jpg', small_frame)
