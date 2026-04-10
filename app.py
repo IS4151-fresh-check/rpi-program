@@ -7,7 +7,7 @@ import os
 import threading
 from datetime import datetime
 import random
-from computer_vision import read_camera, release_camera
+from computer_vision import read_camera, release_camera, init_camera
 from mq2 import read_mq2, calibrate_mq2
 from bme import read_bme280
 from mq2 import read_mq2
@@ -25,6 +25,8 @@ gas_readings_buffer = []
 
 def sensor_loop():
     calibrate_mq2()
+    init_camera()
+    time.sleep(2)
 
     while True:
         print("Collecting sensor data")

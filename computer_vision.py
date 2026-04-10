@@ -22,7 +22,6 @@ def init_camera():
 # 2. Connect to the camera (0 is usually the default USB or Ribbon cam)
 def read_camera():
     global cap
-    init_camera()
     print("Reading camera")
     ret, frame = cap.read()
     if not ret:
@@ -40,12 +39,12 @@ def read_camera():
     label = r.names[class_id]
 
     # --- Save image locally ---
-    filename = "/home/pi/latest.jpg"
-    frame = cv2.resize(frame, (320, 240))
-    cv2.imwrite(filename, frame)
+    small_frame = cv2.resize(frame, (320, 240))
+    _, buffer = cv2.imencode('.jpg', small_frame)
+    
 
     try:
-        image_base64 = encode_to_base64(filename)
+        image_base64 = base64.b64encode(buffer).decode('utf-8')
     except Exception as e:
         print("Base64 encoding failed:", e)
         image_base64 = None
