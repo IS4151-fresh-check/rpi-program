@@ -2,62 +2,74 @@ import cv2
 from ultralytics import YOLO
 import base64
 import time
+import numpy as np
+from picamera2 import Picamera2
 
-cap = None
+# Global variable for the camera object
+picam2 = None
 
-def encode_to_base64(filepath):
-    with open(filepath, "rb") as img_file:
-        return base64.b64encode(img_file.read()).decode('utf-8')
-
-# 1. Load your 99% accurate model
+# 1. Load your model
 model = YOLO('banana_cv_model.pt')
 
 def init_camera():
-    global cap
-    if cap is None or not cap.isOpened():
-        cap = cv2.VideoCapture(0)
-        time.sleep(1) 
-        print("Camera initialising")
+    global picam2
+    if picam2 is None:
+        try:
+            picam2 = Picamera2()
+            # Configure for 640x480 RGB (YOLO's native format)
+            config = picam2.create_video_configuration(
+                main={"size": (640, 480), "format": "RGB888"}
+            )
+            picam2.configure(config)
+            picam2.start()
+            
+            print("Picamera2 started successfully. Resolution: 640x480")
+            # Give the sensor a moment to adjust exposure/white balance
+            time.sleep(2)
+        except Exception as e:
+            print(f"CRITICAL: Picamera2 failed to open: {e}")
 
-# 2. Connect to the camera (0 is usually the default USB or Ribbon cam)
 def read_camera():
-    global cap
+    global picam2
     print("Reading camera")
-    ret, frame = cap.read()
-    if not ret:
-        return {
-            "cvStage": None,
-            "cvConfidence": 0,
-            "imageUrl": None
-        }
-    results = model(frame)
-    r = results[0]
-    probs = r.probs
-
-    class_id = probs.top1
-    conf = probs.top1conf.item()
-    label = r.names[class_id]
-
-    # --- Save image locally ---
-    small_frame = cv2.resize(frame, (320, 240))
-    _, buffer = cv2.imencode('.jpg', small_frame)
     
+    if picam2 is None:
+        return {"cvStage": None, "cvConfidence": 0, "imageBase64": None}
 
     try:
-        image_base64 = base64.b64encode(buffer).decode('utf-8')
-    except Exception as e:
-        print("Base64 encoding failed:", e)
-        image_base64 = None
+        # 1. Capture direct to numpy array (Much faster/stable than GStreamer)
+        frame_rgb = picam2.capture_array()
+        
+        # 2. Convert to BGR for YOLO/OpenCV processing
+        frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
+        
+        # 3. Run Inference
+        results = model(frame_bgr)
+        r = results[0]
+        probs = r.probs
 
-    return {
-        "cvStage": label,
-        "cvConfidence": round(conf, 4),
-        "imageBase64": image_base64
-    }
+        class_id = probs.top1
+        conf = probs.top1conf.item()
+        label = r.names[class_id]
+
+        # 4. Save image for the UI (Resize for smaller Base64 payload)
+        small_frame = cv2.resize(frame_bgr, (320, 240))
+        _, buffer = cv2.imencode('.jpg', small_frame)
+        image_base64 = base64.b64encode(buffer).decode('utf-8')
+
+        return {
+            "cvStage": label,
+            "cvConfidence": round(conf, 4),
+            "imageBase64": image_base64
+        }
+
+    except Exception as e:
+        print(f"ERROR IN CAMERA PROCESSING: {e}")
+        return {"cvStage": None, "cvConfidence": 0, "imageBase64": None}
 
 def release_camera():
-    global cap
-    if cap is not None and cap.isOpened():
-        cap.release()
-        cap = None
-        print("Camera released")
+    global picam2
+    if picam2 is not None:
+        picam2.stop()
+        picam2 = None
+        print("Picamera2 released")
