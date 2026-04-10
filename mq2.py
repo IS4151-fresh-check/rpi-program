@@ -12,7 +12,7 @@ RO_CLEAN_AIR_FACTOR = 9.83  # RS/R0 ratio in clean air (from datasheet)
 
 # LPG curve constants: [log(x), log(y), slope]
 # Derived from datasheet: log(y) = m * log(x) + b
-LPG_CURVE = [2.3, 0.45, -0.47] 
+LPG_CURVE = [2.3, 0.45, -0.35] 
 
 # 1. Setup SPI and MCP3008
 spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
@@ -22,12 +22,18 @@ channel = AnalogIn(mcp, MCP.P0)
 
 def get_rs(voltage):
     """Calculate sensor resistance Rs from voltage."""
-    if voltage == 0: return 0
-    return ((3.3 - voltage) / voltage) * RL_VALUE
+    if voltage < 0.1: return 100.0
+    if voltage > 4.9: return 0.01
+    
+    # NEW FORMULA: RS = RL * (Vcc - Vout) / Vout
+    # This ensures that as Voltage RISES, RS DROPS, and PPM INCREASES.
+    return ((5.0 - voltage) / voltage) * RL_VALUE
 
 def get_ppm(rs, ro, curve):
-    """Calculate PPM using the log-log curve formula."""
-    return math.pow(10, (((math.log10(rs/ro) - curve[1]) / curve[2]) + curve[0]))
+    ratio = rs / ro
+    if ratio <= 0: ratio = 0.001
+    ppm_log = ((math.log10(ratio) - curve[1]) / curve[2]) + curve[0]
+    return math.pow(10, ppm_log)
 
 def calibrate_mq2():
     """Run this once in clean air at startup."""
