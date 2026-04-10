@@ -54,8 +54,8 @@ def read_camera():
 
         if label == "freshripe":
             label = "ripe"
-        elif label == "freshunripe":
-            label = "unripe"
+        elif label == "freshunripe" or label == "unripe":
+            label = "fresh"
         elif label == "rotten":
             label = "spoiled"
 
