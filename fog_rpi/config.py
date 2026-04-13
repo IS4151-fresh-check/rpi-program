@@ -27,6 +27,12 @@ BACKEND_URL = "https://your-cloud-api.com/api/save"
 
 # ── Polling intervals ────────────────────────────────────────
 POLL_INTERVAL_SECONDS = 60      # how often fog polls each leaf RPi
+
+# For testing without a real backend, you can use httpbin.org which will echo the POST data
+# WORKER_NODES = {"test-section-001": "http://localhost:9999/fake"}
+# BACKEND_URL = "https://httpbin.org/post"
+# POLL_INTERVAL_SECONDS = 5
+
 LEAF_REQUEST_TIMEOUT = 15       # HTTP timeout for leaf requests
 BACKEND_REQUEST_TIMEOUT = 30    # HTTP timeout for backend POST
 

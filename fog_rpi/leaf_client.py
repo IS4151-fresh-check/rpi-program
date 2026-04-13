@@ -39,3 +39,14 @@ def fetch_leaf_data(section_id, url):
     except ValueError as e:
         logger.error(f"{section_id} returned invalid JSON: {e}")
         return None
+
+
+# _counter = [0]
+# def fetch_leaf_data(section_id, url):
+#     _counter[0] += 1
+#     ppm = 200 + _counter[0] * 80
+#     return {
+#         "ppm": ppm, "voltage": 0.3 + (ppm/9000)*2,
+#         "cvStage": "fresh" if ppm<500 else "ripe" if ppm<2000 else "overripe" if ppm<5000 else "spoiled",
+#         "cvConfidence": 0.92, "temperature": 24.5, "humidity": 65.0, "imageBase64": "x"
+#     }
