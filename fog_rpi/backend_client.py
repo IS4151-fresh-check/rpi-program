@@ -34,11 +34,13 @@ def send_to_backend(payload):
         )
         if 200 <= response.status_code < 300:
             logger.debug(f"Backend OK: {response.status_code}")
+            print(f"Backend response: {response.text[:200]}")  # Print first 200 chars of response
             return True
         else:
             logger.warning(
                 f"Backend returned {response.status_code}: {response.text[:200]}"
             )
+            print(f"Backend error: {response.status_code} - {response.text[:200]}")
             return False
     except requests.exceptions.RequestException as e:
         logger.error(f"Backend unreachable: {e}")
