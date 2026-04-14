@@ -118,7 +118,7 @@ def process_section(section_id, url, buffers):
             f"{section_id[:8]}... | "
             f"PPM={leaf_data.get('ppm', 0):.0f} | "
             f"CV={leaf_data.get('cvStage', 'none')} | "
-            f"Gas={gas_prediction['gasStage']} ({gas_prediction['gasConfidence']:.0%}) | "
+            f"Gas Prediction={gas_prediction['gasStage']} ({gas_prediction['gasConfidence']:.0%}) | "
             f"Action={gas_prediction['action']}"
         )
     else:

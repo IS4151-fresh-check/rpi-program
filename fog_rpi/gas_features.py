@@ -14,7 +14,7 @@ from scipy import stats
 READING_INTERVAL_SECONDS = 60
 
 
-def engineer_gas_features(readings_buffer, window_size=36, recent_window=6):
+def engineer_gas_features(readings_buffer, window_size=3, recent_window=2):
     """
     Compute features from the most recent readings in the buffer.
 
