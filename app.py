@@ -8,9 +8,10 @@ import threading
 from datetime import datetime
 import random
 from computer_vision import read_camera, release_camera, init_camera
-from mq2 import read_mq2, calibrate_mq2
+#from mq2 import read_mq2, calibrate_mq2
+from mq3_bananabagtest import read_mq3
 from bme import read_bme280
-from mq2 import read_mq2
+#from mq2 import read_mq2
 from gas_features import engineer_features
 from gas_model import predict_gas, WINDOW_SIZE
 import atexit
@@ -24,7 +25,6 @@ DATA_FILE = "/home/pi/sensor_readings.json"
 gas_readings_buffer = []
 
 def sensor_loop():
-    calibrate_mq2()
     init_camera()
     time.sleep(2)
 
@@ -33,7 +33,7 @@ def sensor_loop():
         try:
             cv_data = read_camera()
             bme_data = read_bme280()
-            mq_data = read_mq2()
+            mq_data = read_mq3()
 
             record={
                 "timestamp": datetime.now().isoformat(),

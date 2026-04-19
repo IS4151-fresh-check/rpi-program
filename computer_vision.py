@@ -40,11 +40,8 @@ def read_camera():
         # 1. Capture direct to numpy array (Much faster/stable than GStreamer)
         frame_rgb = picam2.capture_array()
         
-        # 2. Convert to BGR for YOLO/OpenCV processing
-        frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
-        
         # 3. Run Inference
-        results = model(frame_bgr)
+        results = model(frame_rgb)
         r = results[0]
         probs = r.probs
 
@@ -56,11 +53,13 @@ def read_camera():
             label = "ripe"
         elif label == "freshunripe" or label == "unripe":
             label = "fresh"
+        elif label == "freshoverripe":
+            label = "overripe"
         elif label == "rotten":
             label = "spoiled"
 
         # 4. Save image for the UI (Resize for smaller Base64 payload)
-        small_frame = cv2.resize(frame_bgr, (320, 240))
+        small_frame = cv2.resize(frame_rgb, (320, 240))
         _, buffer = cv2.imencode('.jpg', small_frame)
         image_base64 = base64.b64encode(buffer).decode('utf-8')
 
